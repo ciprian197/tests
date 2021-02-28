@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  database:
+    image: mysql:8.0.20
+    container_name: test-database
+    environment:
+      MYSQL_DATABASE: car-test-project
+      MYSQL_USER: car-user
+      MYSQL_PASSWORD: car-user-password
+      MYSQL_ROOT_PASSWORD: rootPassword
+    ports:
+      - '3306:3306'
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --default_week_format=1
