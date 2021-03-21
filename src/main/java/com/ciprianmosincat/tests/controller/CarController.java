@@ -1,8 +1,9 @@
-package com.ciprianmosincat.tests;
+package com.ciprianmosincat.tests.controller;
 
 import com.ciprianmosincat.tests.dto.*;
 import com.ciprianmosincat.tests.dto.pagination.PageRequestDto;
 import com.ciprianmosincat.tests.dto.pagination.PageResponseDto;
+import com.ciprianmosincat.tests.resourceaccess.car.CarResourceAccess;
 import com.ciprianmosincat.tests.service.car.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,8 @@ import javax.validation.constraints.NotNull;
 @RestController
 public class CarController {
 
-    public final CarService carService;
+    private final CarService carService;
+    private final CarResourceAccess carResourceAccess;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -27,7 +29,7 @@ public class CarController {
     @GetMapping
     public PageResponseDto<CarDto> getCars(@ModelAttribute final CarFiltersDto filters,
                                            @ModelAttribute final PageRequestDto<CarSortField> pageRequest) {
-        return carService.getCars(filters, pageRequest);
+        return carResourceAccess.getCars(filters, pageRequest);
     }
 
 }

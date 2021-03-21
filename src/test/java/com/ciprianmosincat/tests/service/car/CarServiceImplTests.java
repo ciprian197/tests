@@ -6,8 +6,9 @@ import com.ciprianmosincat.tests.domain.User;
 import com.ciprianmosincat.tests.dto.CarCreateDto;
 import com.ciprianmosincat.tests.exception.CustomRuntimeException;
 import com.ciprianmosincat.tests.repository.car.CarRepository;
-import com.ciprianmosincat.tests.service.carbrand.CarBrandInternalService;
-import com.ciprianmosincat.tests.service.user.UserInternalService;
+import com.ciprianmosincat.tests.resourceaccess.car.CarInternalResourceAccess;
+import com.ciprianmosincat.tests.resourceaccess.carbrand.CarBrandInternalResourceAccess;
+import com.ciprianmosincat.tests.resourceaccess.user.UserInternalResourceAccess;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,9 +32,11 @@ public class CarServiceImplTests {
     @Mock
     private CarRepository carRepository;
     @Mock
-    private UserInternalService userService;
+    private CarInternalResourceAccess carResourceAccess;
     @Mock
-    private CarBrandInternalService carBrandService;
+    private UserInternalResourceAccess userResourceAccess;
+    @Mock
+    private CarBrandInternalResourceAccess carBrandResourceAccess;
 
     @InjectMocks
     private CarServiceImpl carService;
@@ -81,8 +84,8 @@ public class CarServiceImplTests {
             final CarCreateDto carCreateDto = getDefaultCarCreateDto().build();
             final CarBrand carBrand = getDefaultCarBrand().build();
 
-            when(carBrandService.getCarBrand(carCreateDto.getBrandId())).thenReturn(carBrand);
-            when(carRepository.existsByBrandIdAndName(carCreateDto.getBrandId(), carCreateDto.getName())).thenReturn(true);
+            when(carBrandResourceAccess.getById(carCreateDto.getBrandId())).thenReturn(carBrand);
+            when(carResourceAccess.existsByBrandIdAndName(carCreateDto.getBrandId(), carCreateDto.getName())).thenReturn(true);
 
             // When
             assertThatThrownBy(() -> carService.createCar(carCreateDto))
@@ -98,8 +101,8 @@ public class CarServiceImplTests {
             final CarBrand carBrand = getDefaultCarBrand().build();
             final ArgumentCaptor<Car> argumentCaptor = ArgumentCaptor.forClass(Car.class);
 
-            when(carBrandService.getCarBrand(carCreateDto.getBrandId())).thenReturn(carBrand);
-            when(carRepository.existsByBrandIdAndName(carCreateDto.getBrandId(), carCreateDto.getName())).thenReturn(false);
+            when(carBrandResourceAccess.getById(carCreateDto.getBrandId())).thenReturn(carBrand);
+            when(carResourceAccess.existsByBrandIdAndName(carCreateDto.getBrandId(), carCreateDto.getName())).thenReturn(false);
             when(carRepository.save(any(Car.class))).thenReturn(new Car());
 
             // When
@@ -126,7 +129,7 @@ public class CarServiceImplTests {
             final UUID carId = UUID.randomUUID();
             final User user = getDefaultUser().build();
 
-            when(userService.getCurrentLoggedInUser()).thenReturn(user);
+            when(userResourceAccess.getCurrentLoggedInUser()).thenReturn(user);
             when(carRepository.findById(carId)).thenReturn(Optional.empty());
 
             // When
@@ -147,7 +150,7 @@ public class CarServiceImplTests {
             final Car car = getDefaultCar()
                     .price(BigDecimal.TEN).build();
 
-            when(userService.getCurrentLoggedInUser()).thenReturn(user);
+            when(userResourceAccess.getCurrentLoggedInUser()).thenReturn(user);
             when(carRepository.findById(carId)).thenReturn(Optional.of(car));
 
             // When
@@ -166,7 +169,7 @@ public class CarServiceImplTests {
             final Car car = getDefaultCar()
                     .price(BigDecimal.ONE).build();
 
-            when(userService.getCurrentLoggedInUser()).thenReturn(user);
+            when(userResourceAccess.getCurrentLoggedInUser()).thenReturn(user);
             when(carRepository.findById(carId)).thenReturn(Optional.of(car));
 
             // When
@@ -177,6 +180,5 @@ public class CarServiceImplTests {
         }
 
     }
-
 
 }
