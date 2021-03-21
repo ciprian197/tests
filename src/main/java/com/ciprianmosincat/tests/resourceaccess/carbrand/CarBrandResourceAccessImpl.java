@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static com.ciprianmosincat.tests.exception.CarErrorCode.NOT_FOUND;
+import static com.ciprianmosincat.tests.exception.CarBrandErrorCode.NOT_FOUND;
 
 @RequiredArgsConstructor
 @Component

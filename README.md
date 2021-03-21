@@ -4,11 +4,11 @@ This repository is an example application for using several technologies from Ja
 # Existing features:
 * Custom filtering and pagination with custom response from database (if your goal is just to retrieve plain entities from the database then I recommend taking a look at [QuerydslPredicateExecutor](https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/querydsl/QuerydslPredicateExecutor.html))
 * Testing using JUnit 5
+* Testing using [TestContainers](https://www.testcontainers.org) and WebTestClient
 
 # Features that might follow
 * Security using Keycloak - integrating access logic in queries for resource access management
 * GraphQL endpoints 
-* Integration tests with [TestContainers](https://www.testcontainers.org)
 
 # Getting Started
 * Build project: **./gradlew clean build**
