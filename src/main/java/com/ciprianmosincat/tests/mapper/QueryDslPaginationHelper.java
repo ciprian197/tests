@@ -1,5 +1,6 @@
 package com.ciprianmosincat.tests.mapper;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -9,8 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class QueryDslPaginationHelper {
 
@@ -18,9 +17,8 @@ public class QueryDslPaginationHelper {
                                            final Class<E> targetClass, final String parentFieldName) {
         addPaginationToQuery(query, pageable, targetClass, parentFieldName);
 
-        final long total = query.fetchCount();
-        final List<T> content = query.fetch();
-        return new PageImpl<>(content, pageable, total);
+        final QueryResults<T> result = query.fetchResults();
+        return new PageImpl<>(result.getResults(), pageable, result.getTotal());
     }
 
     private <T, E> void addPaginationToQuery(final JPAQuery<T> query, final Pageable pageable, final Class<E> targetClass,
