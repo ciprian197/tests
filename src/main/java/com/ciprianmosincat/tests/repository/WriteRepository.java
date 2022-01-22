@@ -16,7 +16,7 @@ public interface WriteRepository<T, ID> extends Repository<T, ID> {
 
     void delete(T entity);
 
-    void deleteAllById(Iterable<? extends ID> ids);
+    void deleteAllByIdIn(Iterable<? extends ID> ids);
 
     void deleteAll(Iterable<? extends T> entities);
 
