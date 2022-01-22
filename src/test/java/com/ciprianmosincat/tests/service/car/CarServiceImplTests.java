@@ -4,8 +4,9 @@ import com.ciprianmosincat.tests.domain.Car;
 import com.ciprianmosincat.tests.domain.CarBrand;
 import com.ciprianmosincat.tests.domain.User;
 import com.ciprianmosincat.tests.dto.CarCreateDto;
+import com.ciprianmosincat.tests.dto.CarFiltersDto;
 import com.ciprianmosincat.tests.exception.CustomRuntimeException;
-import com.ciprianmosincat.tests.repository.car.CarRepository;
+import com.ciprianmosincat.tests.repository.car.WriteCarRepository;
 import com.ciprianmosincat.tests.resourceaccess.car.CarInternalResourceAccess;
 import com.ciprianmosincat.tests.resourceaccess.carbrand.CarBrandInternalResourceAccess;
 import com.ciprianmosincat.tests.resourceaccess.user.UserInternalResourceAccess;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.*;
 public class CarServiceImplTests {
 
     @Mock
-    private CarRepository carRepository;
+    private WriteCarRepository carRepository;
     @Mock
     private CarInternalResourceAccess carResourceAccess;
     @Mock
@@ -128,9 +129,10 @@ public class CarServiceImplTests {
             // Given
             final UUID carId = UUID.randomUUID();
             final User user = getDefaultUser().build();
+            final ArgumentCaptor<CarFiltersDto> argumentCaptorForCarFilter = ArgumentCaptor.forClass(CarFiltersDto.class);
 
             when(userResourceAccess.getCurrentLoggedInUser()).thenReturn(user);
-            when(carRepository.findById(carId)).thenReturn(Optional.empty());
+            when(carResourceAccess.findOne(any())).thenReturn(Optional.empty());
 
             // When
             assertThatThrownBy(() -> carService.purchaseCar(carId))
@@ -138,7 +140,10 @@ public class CarServiceImplTests {
                     .isInstanceOf(CustomRuntimeException.class)
                     .matches(e -> NOT_FOUND.equals(((CustomRuntimeException) e).getErrorCode()));
 
-            verify(carRepository).findById(carId);
+            verify(carResourceAccess).findOne(argumentCaptorForCarFilter.capture());
+            final CarFiltersDto filtersDto = argumentCaptorForCarFilter.getValue();
+            assertThat(filtersDto.getIds()).containsExactly(carId);
+            assertThat(filtersDto).hasAllNullFieldsOrPropertiesExcept("ids");
         }
 
         @Test
@@ -149,15 +154,21 @@ public class CarServiceImplTests {
                     .amount(BigDecimal.ONE).build();
             final Car car = getDefaultCar()
                     .price(BigDecimal.TEN).build();
+            final ArgumentCaptor<CarFiltersDto> argumentCaptorForCarFilter = ArgumentCaptor.forClass(CarFiltersDto.class);
 
             when(userResourceAccess.getCurrentLoggedInUser()).thenReturn(user);
-            when(carRepository.findById(carId)).thenReturn(Optional.of(car));
+            when(carResourceAccess.findOne(any())).thenReturn(Optional.of(car));
 
             // When
             assertThatThrownBy(() -> carService.purchaseCar(carId))
                     // Then
                     .isInstanceOf(CustomRuntimeException.class)
                     .matches(e -> INSUFFICIENT_AMOUNT.equals(((CustomRuntimeException) e).getErrorCode()));
+
+            verify(carResourceAccess).findOne(argumentCaptorForCarFilter.capture());
+            final CarFiltersDto filtersDto = argumentCaptorForCarFilter.getValue();
+            assertThat(filtersDto.getIds()).containsExactly(carId);
+            assertThat(filtersDto).hasAllNullFieldsOrPropertiesExcept("ids");
         }
 
         @Test
@@ -168,15 +179,21 @@ public class CarServiceImplTests {
                     .amount(BigDecimal.TEN).build();
             final Car car = getDefaultCar()
                     .price(BigDecimal.ONE).build();
+            final ArgumentCaptor<CarFiltersDto> argumentCaptorForCarFilter = ArgumentCaptor.forClass(CarFiltersDto.class);
 
             when(userResourceAccess.getCurrentLoggedInUser()).thenReturn(user);
-            when(carRepository.findById(carId)).thenReturn(Optional.of(car));
+            when(carResourceAccess.findOne(any())).thenReturn(Optional.of(car));
 
             // When
             assertThatCode(() -> carService.purchaseCar(carId))
                     // Then
                     .doesNotThrowAnyException();
             assertThat(user.getCars()).containsExactly(car);
+
+            verify(carResourceAccess).findOne(argumentCaptorForCarFilter.capture());
+            final CarFiltersDto filtersDto = argumentCaptorForCarFilter.getValue();
+            assertThat(filtersDto.getIds()).containsExactly(carId);
+            assertThat(filtersDto).hasAllNullFieldsOrPropertiesExcept("ids");
         }
 
     }

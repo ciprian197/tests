@@ -4,9 +4,10 @@ import com.ciprianmosincat.tests.domain.Car;
 import com.ciprianmosincat.tests.domain.CarBrand;
 import com.ciprianmosincat.tests.domain.User;
 import com.ciprianmosincat.tests.dto.CarCreateDto;
+import com.ciprianmosincat.tests.dto.CarFiltersDto;
 import com.ciprianmosincat.tests.dto.IdWrapperDto;
 import com.ciprianmosincat.tests.exception.CustomRuntimeException;
-import com.ciprianmosincat.tests.repository.car.CarRepository;
+import com.ciprianmosincat.tests.repository.car.WriteCarRepository;
 import com.ciprianmosincat.tests.resourceaccess.car.CarInternalResourceAccess;
 import com.ciprianmosincat.tests.resourceaccess.carbrand.CarBrandInternalResourceAccess;
 import com.ciprianmosincat.tests.resourceaccess.user.UserInternalResourceAccess;
@@ -22,7 +23,7 @@ import static com.ciprianmosincat.tests.exception.CarErrorCode.*;
 @Service
 class CarServiceImpl implements CarService {
 
-    private final CarRepository carRepository;
+    private final WriteCarRepository writeCarRepository;
     private final CarInternalResourceAccess carResourceAccess;
     private final UserInternalResourceAccess userResourceAccess;
     private final CarBrandInternalResourceAccess carBrandResourceAccess;
@@ -34,7 +35,7 @@ class CarServiceImpl implements CarService {
         validateCanCreateCarForBrandAndName(carDto.getBrandId(), carDto.getName());
 
         final Car car = toEntity(carDto, brand);
-        final Car savedCar = carRepository.save(car);
+        final Car savedCar = writeCarRepository.save(car);
 
         return new IdWrapperDto(savedCar.getId());
     }
@@ -69,7 +70,7 @@ class CarServiceImpl implements CarService {
     }
 
     private Car getCar(final UUID carId) {
-        return carRepository.findById(carId)
+        return carResourceAccess.findOne(CarFiltersDto.forId(carId))
                 .orElseThrow(() -> new CustomRuntimeException(NOT_FOUND));
     }
 

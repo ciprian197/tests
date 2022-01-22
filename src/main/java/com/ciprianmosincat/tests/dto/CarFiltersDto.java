@@ -1,17 +1,14 @@
 package com.ciprianmosincat.tests.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CarFiltersDto {
 
     Set<UUID> ids;
@@ -21,5 +18,16 @@ public class CarFiltersDto {
     Set<UUID> ownerIds;
 
     String name;
+
+    public static CarFiltersDto forBrandIdAndName(final UUID brandId, final String name) {
+        return CarFiltersDto.builder()
+                .brandIds(Set.of(brandId))
+                .name(name).build();
+    }
+
+    public static CarFiltersDto forId(final UUID id) {
+        return CarFiltersDto.builder()
+                .ids(Set.of(id)).build();
+    }
 
 }
